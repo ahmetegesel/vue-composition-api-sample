@@ -1,9 +1,7 @@
 <template>
   <div>
     <span>{{ name }}</span>
-    <button @click="increment">
-      Count is: {{ state.count }}, double is: {{ state.double }}
-    </button>
+    <v-btn @click="increment">Count is: {{ state.count }}, double is: {{ state.double }}</v-btn>
   </div>
 </template>
 
