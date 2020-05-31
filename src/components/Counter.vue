@@ -1,22 +1,33 @@
 <template>
-  <div>{{ count }} {{ object.foo }} {{name}}</div>
+  <div>
+    <span>{{ name }}</span>
+    <button @click="increment">
+      Count is: {{ state.count }}, double is: {{ state.double }}
+    </button>
+  </div>
 </template>
 
 <script>
-import { ref, reactive } from '@vue/composition-api';
+import { reactive, computed } from '@vue/composition-api';
 
 export default {
   props: {
     name: String,
   },
   setup() {
-    const count = ref(0);
-    const object = reactive({ foo: 'bar' });
+    const state = reactive({
+      count: 0,
+      double: computed(() => state.count * 2),
+    });
+
+    const increment = () => {
+      state.count += 1;
+    };
 
     // expose to template
     return {
-      count,
-      object,
+      state,
+      increment,
     };
   },
 };
