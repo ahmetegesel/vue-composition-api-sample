@@ -1,5 +1,5 @@
 <template>
-  <v-row no-gutters>
+  <v-row no-gutters style="height: 93vh">
     <v-col
       cols="12"
       sm="2"
@@ -21,8 +21,26 @@
       sm="2"
     >
       <Sidebar>
-        <slot name="right-sidebar"/>
+        <v-row>
+          <slot name="right-sidebar"/>
+        </v-row>
+        <v-row>
+          <slot name="action" />
+        </v-row>
       </Sidebar>
     </v-col>
   </v-row>
 </template>
+
+<script>
+import Sidebar from './Sidebar.vue';
+import ContentContainer from './ContentContainer.vue';
+
+export default {
+  name: 'ContentDetailPageTemplate',
+  components: {
+    Sidebar,
+    ContentContainer,
+  },
+};
+</script>

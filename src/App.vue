@@ -4,6 +4,7 @@
       app
       color="primary"
       dark
+      class="app-bar"
     >
       <div class="d-flex align-center">
         <v-img
@@ -37,8 +38,18 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content>
+    <v-content class="app-content">
       <router-view/>
     </v-content>
   </v-app>
 </template>
+
+<style>
+  .app-bar {
+    height: 10vh;
+  }
+
+  .app-content {
+    height: 90vh;
+  }
+</style>
