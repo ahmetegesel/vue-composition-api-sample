@@ -8,6 +8,8 @@
     item-text="name"
     label="Category"
     placeholder="Type category name"
+    :search-input.sync="search"
+    @change="onSearchInputChanged"
   />
 </template>
 
@@ -18,6 +20,7 @@ import CategoryApi from './api/CategoryApi';
 import { useTwoWayBinding } from '../helpers/binding';
 import { filterByGivenObjects } from '../../helpers';
 import { useSortArrayBySelected } from '../helpers/sorting';
+import { useSearchWithCleaningAfterSelection } from '../helpers/searching';
 
 export default {
   props: {
@@ -36,9 +39,13 @@ export default {
       categories.value = await CategoryApi.getCategories();
     });
 
+    const { search, onChanged: onSearchInputChanged } = useSearchWithCleaningAfterSelection();
+
     return {
       lazyCategories,
       lazyValue,
+      search,
+      onSearchInputChanged,
     };
   },
 };

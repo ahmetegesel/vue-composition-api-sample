@@ -1,6 +1,7 @@
 export const isUndefined = (value) => typeof value === 'undefined';
 export const isNull = (value) => value === null;
 export const isNullOrUndefined = (value) => isUndefined(value) || isNull(value);
+export const isFunction = (value) => typeof value === 'function';
 
 export const negateFn = (fn) => (...args) => !fn(...args);
 
