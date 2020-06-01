@@ -2,7 +2,8 @@
   <div class="news">
     <ContentDetailPageTemplate>
       <template slot="left-sidebar">
-        <Category v-model="news.category"/>
+        <Category v-model="news.categories"/>
+        <Source v-model="news.sources"/>
       </template>
       <template slot="content-container">
         Title
@@ -20,17 +21,20 @@
 <script>
 import ContentDetailPageTemplate from '../components/entity/ContentDetailPageTemplate.vue';
 import Category from '../components/category/Category.vue';
+import Source from '../components/source/Source.vue';
 
 export default {
   name: 'News',
   components: {
     ContentDetailPageTemplate,
     Category,
+    Source,
   },
   data() {
     return {
       news: {
-        category: [],
+        categories: [],
+        sources: [],
       },
     };
   },

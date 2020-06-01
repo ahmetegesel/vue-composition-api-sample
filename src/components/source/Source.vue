@@ -3,21 +3,21 @@
     multiple
     return-object
     v-model="lazyValue"
-    :items="lazyCategories"
+    :items="lazySources"
     item-value="id"
     item-text="name"
-    label="Category"
-    placeholder="Type category name"
+    label="Source"
+    placeholder="Type Source name"
   />
 </template>
-
 <script>
-import { ref, onMounted } from '@vue/composition-api';
 
-import CategoryApi from './api/CategoryApi';
+import { onMounted, ref } from '@vue/composition-api';
+
 import { useTwoWayBinding } from '../helpers/binding';
-import { filterByGivenObjects } from '../../helpers';
 import { useSortArrayBySelected } from '../helpers/sorting';
+import { filterByGivenObjects } from '../../helpers';
+import SourceApi from './api/SourceApi';
 
 export default {
   props: {
@@ -29,18 +29,17 @@ export default {
   setup({ value }, { emit }) {
     const { lazyValue } = useTwoWayBinding(value, emit);
 
-    const categories = ref([]);
-    const { lazyItems: lazyCategories } = useSortArrayBySelected(categories, lazyValue, filterByGivenObjects);
+    const sources = ref([]);
+    const { lazyItems: lazySources } = useSortArrayBySelected(sources, lazyValue, filterByGivenObjects);
 
     onMounted(async () => {
-      categories.value = await CategoryApi.getCategories();
+      sources.value = await SourceApi.getSources();
     });
 
     return {
-      lazyCategories,
+      lazySources,
       lazyValue,
     };
   },
 };
-
 </script>
