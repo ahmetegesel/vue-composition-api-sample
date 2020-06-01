@@ -29,13 +29,14 @@ export default {
   },
   data() {
     return {
-      news: {},
+      news: {
+        category: [],
+      },
     };
   },
   methods: {
     showModel() {
-      // eslint-disable-next-line no-alert
-      alert(JSON.stringify(this.news));
+      console.log(this.news); // eslint-disable-line no-console
     },
   },
 };

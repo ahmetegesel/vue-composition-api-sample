@@ -2,8 +2,8 @@
   <v-autocomplete
     multiple
     return-object
-    v-model="state.lazyValue"
-    :items="state.categories"
+    v-model="lazyValue"
+    :items="categories"
     item-value="id"
     item-text="name"
     label="Category"
@@ -12,9 +12,12 @@
 </template>
 
 <script>
-import { reactive, watch, onMounted } from '@vue/composition-api';
+import {
+  ref, onMounted,
+} from '@vue/composition-api';
 
 import CategoryApi from './api/CategoryApi';
+import { useTwoWayBinding } from '../helpers/binding';
 
 export default {
   props: {
@@ -24,29 +27,17 @@ export default {
     },
   },
   setup({ value }, { emit }) {
-    const state = reactive({
-      lazyValue: [],
-      categories: [],
-    });
+    const { lazyValue } = useTwoWayBinding(value, emit);
 
-    watch(
-      () => value,
-      (newValue) => {
-        state.lazyValue = newValue;
-      },
-    );
-
-    watch(
-      () => state.lazyValue,
-      (values) => emit('input', values),
-    );
+    const categories = ref([]);
 
     onMounted(async () => {
-      state.categories = await CategoryApi.getCategories();
+      categories.value = await CategoryApi.getCategories();
     });
 
     return {
-      state,
+      categories,
+      lazyValue,
     };
   },
 };
