@@ -2,8 +2,8 @@
   <v-autocomplete
     multiple
     return-object
-    v-model="lazyValue"
-    :items="categories"
+    v-model="state.lazyValue"
+    :items="state.categories"
     item-value="id"
     item-text="name"
     label="Category"
@@ -12,32 +12,42 @@
 </template>
 
 <script>
+import { reactive, watch, onMounted } from '@vue/composition-api';
+
 import CategoryApi from './api/CategoryApi';
 
 export default {
-  name: 'Category',
   props: {
     value: {
       type: Array,
       default: () => [],
     },
   },
-  data() {
-    return {
+  setup({ value }, { emit }) {
+    const state = reactive({
       lazyValue: [],
       categories: [],
+    });
+
+    watch(
+      () => value,
+      (newValue) => {
+        state.lazyValue = newValue;
+      },
+    );
+
+    watch(
+      () => state.lazyValue,
+      (values) => emit('input', values),
+    );
+
+    onMounted(async () => {
+      state.categories = await CategoryApi.getCategories();
+    });
+
+    return {
+      state,
     };
-  },
-  async mounted() {
-    this.categories = await CategoryApi.getCategories();
-  },
-  watch: {
-    value(value) {
-      this.lazyValue = value;
-    },
-    lazyValue(values) {
-      this.$emit('input', values);
-    },
   },
 };
 
