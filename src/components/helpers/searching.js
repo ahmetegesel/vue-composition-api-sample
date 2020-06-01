@@ -1,15 +1,8 @@
 import { ref } from '@vue/composition-api';
 
-export const useSearch = () => {
-  const search = ref('');
-
-  return {
-    search,
-  };
-};
-
+// eslint-disable-next-line import/prefer-default-export
 export const useSearchWithCleaningAfterSelection = () => {
-  const { search } = useSearch();
+  const search = ref('');
 
   const onChanged = () => {
     search.value = '';
