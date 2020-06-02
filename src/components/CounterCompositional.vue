@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn @click="increment">Count is: {{ count.value }}</v-btn>
+    <v-btn @click="increment">Count is: {{ toRaw(count) }}</v-btn>
   </div>
 </template>
 
@@ -20,9 +20,15 @@ const useCounter = () => {
   };
 };
 
-const compose = (options) => ({
-  ...options.setup(),
-});
+const compose = (component) => {
+  const options = {
+    ...component.setup(),
+  };
+
+  options.methods.toRaw = (object) => object.value;
+
+  return options;
+};
 
 export default compose({
   setup() {
@@ -41,7 +47,3 @@ export default compose({
   },
 });
 </script>
-
-<style scoped>
-
-</style>
