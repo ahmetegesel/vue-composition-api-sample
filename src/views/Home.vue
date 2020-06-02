@@ -98,6 +98,7 @@
 
         <v-row justify="center">
           <Counter name="Ahmet Egesel" />
+          <CounterCompositional />
         </v-row>
       </v-col>
     </v-row>
@@ -106,11 +107,13 @@
 
 <script>
 import Counter from '../components/Counter.vue';
+import CounterCompositional from '../components/CounterCompositional.vue';
 
 export default {
   name: 'Home',
   components: {
     Counter,
+    CounterCompositional,
   },
   data: () => ({
     ecosystem: [
