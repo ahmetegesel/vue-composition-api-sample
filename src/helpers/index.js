@@ -59,8 +59,7 @@ export const filterByGivenValues = (values = []) => {
 export const sortArrayBy = (predicateFn, ...args) => (allItems, selectedItems) => {
   const filterFn = predicateFn(selectedItems, ...args);
 
-  const selected = allItems.filter(filterFn);
   const notSelected = allItems.filter(negateFn(filterFn));
 
-  return [...selected, ...notSelected];
+  return [...selectedItems, ...notSelected];
 };
