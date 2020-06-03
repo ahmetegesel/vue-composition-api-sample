@@ -1,24 +1,24 @@
-import { isRef, ref, watch } from '@vue/composition-api';
-import { sortArrayBy } from '../../helpers';
+import { ref, watch } from '@vue/composition-api';
+import { sortArrayBy, toRaw } from '../../helpers';
 
 // eslint-disable-next-line import/prefer-default-export
 export const useSortArrayBySelected = (items, selectedItems, filterFn) => {
   const lazyItems = ref([]);
 
   const sortItems = () => sortArrayBy(filterFn)(
-    isRef(items) ? items.value : items,
-    isRef(selectedItems) ? selectedItems.value : selectedItems,
+    toRaw(items),
+    toRaw(selectedItems),
   );
 
   const updateSelectedItems = () => {
     lazyItems.value = sortItems();
   };
 
-  watch(isRef(selectedItems) ? () => selectedItems.value : () => selectedItems, () => {
+  watch(() => toRaw(selectedItems), () => {
     updateSelectedItems();
   });
 
-  watch(isRef(items) ? () => items.value : () => items, () => {
+  watch(() => toRaw(items), () => {
     updateSelectedItems();
   });
 

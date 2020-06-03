@@ -1,9 +1,13 @@
+import { isRef } from '@vue/composition-api';
+
 export const isUndefined = (value) => typeof value === 'undefined';
 export const isNull = (value) => value === null;
 export const isNullOrUndefined = (value) => isUndefined(value) || isNull(value);
 export const isFunction = (value) => typeof value === 'function';
 
 export const negateFn = (fn) => (...args) => !fn(...args);
+
+export const toRaw = (obj) => (isRef(obj) ? obj.value : obj);
 
 /**
  * Return an object key/value of given array
