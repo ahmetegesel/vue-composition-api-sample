@@ -14,13 +14,8 @@
 </template>
 
 <script>
-import { ref, onMounted } from '@vue/composition-api';
-
 import CategoryApi from './api/CategoryApi';
-import { useTwoWayBinding } from '../helpers/binding';
-import { filterByGivenObjects } from '../../helpers';
-import { useSortArrayBySelected } from '../helpers/sorting';
-import { useSearchWithCleaningAfterSelection } from '../helpers/searching';
+import { useSearchableSelect } from '../helpers/selects';
 
 export default {
   props: {
@@ -30,16 +25,12 @@ export default {
     },
   },
   setup({ value }, { emit }) {
-    const { lazyValue } = useTwoWayBinding(value, emit);
-
-    const categories = ref([]);
-    const { lazyItems: lazyCategories } = useSortArrayBySelected(categories, lazyValue, filterByGivenObjects);
-
-    onMounted(async () => {
-      categories.value = await CategoryApi.getCategories();
-    });
-
-    const { search, onChanged: onSearchInputChanged } = useSearchWithCleaningAfterSelection();
+    const {
+      lazyValue,
+      lazyItems: lazyCategories,
+      search,
+      onSearchInputChanged,
+    } = useSearchableSelect(value, emit, () => CategoryApi.getCategories());
 
     return {
       lazyCategories,
