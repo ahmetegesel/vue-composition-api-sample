@@ -2,7 +2,7 @@ import { onMounted, ref } from '@vue/composition-api';
 import { useTwoWayBinding } from './binding';
 import { useSortArrayBySelected } from './sorting';
 import { filterByGivenObjects, isFunction, isNullOrUndefined } from '../../helpers';
-import { useSearchWithCleaningAfterSelection } from './searching';
+import { useSearchWithCleaningAfterEvent } from './searching';
 
 // eslint-disable-next-line import/prefer-default-export
 export const useSearchableSelect = (value, emit, items) => {
@@ -21,7 +21,7 @@ export const useSearchableSelect = (value, emit, items) => {
     });
   }
 
-  const { search, onChanged: onSearchInputChanged } = useSearchWithCleaningAfterSelection();
+  const { search, onChanged: onSearchInputChanged } = useSearchWithCleaningAfterEvent();
 
   return {
     lazyItems,
