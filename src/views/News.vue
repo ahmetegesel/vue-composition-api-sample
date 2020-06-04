@@ -6,7 +6,7 @@
         <Source v-model="news.sources"/>
       </template>
       <template slot="content-container">
-        Title
+        <Tags v-model="news.tags" />
       </template>
       <template slot="right-sidebar">
         Content Types
@@ -22,6 +22,7 @@
 import ContentDetailPageTemplate from '../components/entity/ContentDetailPageTemplate.vue';
 import Category from '../components/category/Category.vue';
 import Source from '../components/source/Source.vue';
+import Tags from '../components/tags/Tags.vue';
 
 export default {
   name: 'News',
@@ -29,12 +30,14 @@ export default {
     ContentDetailPageTemplate,
     Category,
     Source,
+    Tags,
   },
   data() {
     return {
       news: {
         categories: [],
         sources: [],
+        tags: [],
       },
     };
   },
