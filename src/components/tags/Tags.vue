@@ -1,53 +1,38 @@
-
 <template>
-  <v-form>
-    <v-container>
-      <v-row>
-        <v-autocomplete
-          cache-items
-          multiple
-          chips
-          label="Add tag"
-          item-text="name"
-          item-value="name"
-          v-model="lazyValue"
-          :loading="isSearching"
-          :items="activeTags"
-          :search-input.sync="search"
-          @change="onTagsChanged"
+  <div>
+    <v-row>
+      <v-col
+        v-for="(tag, index) in lazyValue"
+        :key="`tag-${index}`"
+      >
+        <v-chip
+          close
+          @click:close="remove(tag)"
         >
-          <template v-slot:selection="data">
-            <v-chip
-              close
-              v-bind="data.attrs"
-              :input-value="data.selected"
-              @click="data.select"
-              @click:close="remove(data.item)"
-            >
-              {{ data.item.name }}
-            </v-chip>
-          </template>
-          <template v-slot:item="data">
-            <template v-if="typeof data.item !== 'object'">
-              <v-list-item-content v-text="data.item"/>
-            </template>
-            <template v-else>
-              <v-list-item-content>
-                <v-list-item-title v-html="data.item.name"/>
-                <v-list-item-subtitle v-html="data.item.group"/>
-              </v-list-item-content>
-            </template>
-          </template>
-        </v-autocomplete>
-      </v-row>
-    </v-container>
-  </v-form>
+          {{ tag }}
+        </v-chip>
+      </v-col>
+    </v-row>
+    <v-autocomplete
+      label="Add tag..."
+      :loading="isSearching"
+      :items="activeTags"
+      :search-input.sync="search"
+      @change="onTagsChanged"
+    >
+      <template v-slot:item="{ item }">
+        <v-list-item-content>
+          <v-list-item-title v-html="item" />
+        </v-list-item-content>
+      </template>
+    </v-autocomplete>
+  </div>
 </template>
 
 <script>
-import { watch, ref } from '@vue/composition-api';
+import { watch, ref, computed } from '@vue/composition-api';
 import TagApi from './api/TagsApi';
-import { useTwoWayManuelBinding } from '../helpers/binding';
+import { useTwoWayBinding } from '../helpers/binding';
 import { useSearchWithCleaningAfterEvent } from '../helpers/searching';
 
 export default {
@@ -60,41 +45,64 @@ export default {
   setup({ value }, { emit }) {
     const activeTags = ref([]);
     const isSearching = ref(false);
-    const { lazyValue, triggerInput } = useTwoWayManuelBinding(value, emit);
-    const { search, onChanged: cleanSearch } = useSearchWithCleaningAfterEvent();
+    const { lazyValue, updateValue } = useTwoWayBinding(value, emit);
+    const { search: searchText, onChanged: cleanSearch } = useSearchWithCleaningAfterEvent();
 
-    const onTagsChanged = () => {
+    const onTagsChanged = (newValue) => {
       cleanSearch();
-      triggerInput(lazyValue);
+      lazyValue.value.push(newValue);
+      activeTags.value = [];
+      updateValue(lazyValue.value);
     };
 
     const remove = (item) => {
-      lazyValue.value.splice(0);
-      lazyValue.value.push(lazyValue.value.filter((tag) => tag !== item.name));
+      lazyValue.value = lazyValue.value.filter((tag) => tag !== item);
     };
 
     const addTag = (tag) => {
       if (!lazyValue.value.includes(tag)) {
-        activeTags.value.push({ name: tag });
         lazyValue.value.push(tag);
-        search.value = '';
       }
+
+      cleanSearch();
     };
 
-    watch(() => value, (newValue) => {
-      activeTags.value.push(...newValue.map((item) => ({ name: item })));
+    const search = computed({
+      get() {
+        return searchText.value;
+      },
+      async set(newTag) {
+        searchText.value = newTag;
+
+        if (searchText.value && searchText.value.length >= 3) {
+          if (searchText.value.slice(-1) === ',') {
+            addTag(searchText.value.slice(0, -1));
+          } else {
+            const result = await TagApi.getTags(searchText.value);
+
+            if (result) {
+              isSearching.value = true;
+              activeTags.value = result.filter((tag) => !lazyValue.value.includes(tag));
+            }
+          }
+        }
+
+        isSearching.value = false;
+      },
     });
 
-    watch(() => search.value, async (name) => {
-      if (name && name.length >= 3) {
-        if (name.slice(-1) === ',') {
-          addTag(name.slice(0, -1));
+    watch(() => search.value, async (newTag) => {
+      search.value = newTag;
+
+      if (newTag && newTag.length >= 3) {
+        if (newTag.slice(-1) === ',') {
+          addTag(newTag.slice(0, -1));
         } else {
-          const result = await TagApi.getTags(name);
+          const result = await TagApi.getTags(newTag);
 
           if (result) {
             isSearching.value = true;
-            activeTags.value = result;
+            activeTags.value = result.filter((tag) => !lazyValue.value.includes(tag));
           }
         }
       }

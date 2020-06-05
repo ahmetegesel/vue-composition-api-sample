@@ -1,5 +1,5 @@
 import { onMounted, ref } from '@vue/composition-api';
-import { useTwoWayBinding } from './binding';
+import { useTwoWayAutoBinding } from './binding';
 import { useSortArrayBySelected } from './sorting';
 import { filterByGivenObjects, isFunction, isNullOrUndefined } from '../../helpers';
 import { useSearchWithCleaningAfterEvent } from './searching';
@@ -10,7 +10,7 @@ export const useSearchableSelect = (value, emit, items) => {
     throw new Error('You must define valid items Array or a Function to retrieve them.');
   }
 
-  const { lazyValue } = useTwoWayBinding(value, emit);
+  const { lazyValue } = useTwoWayAutoBinding(value, emit);
 
   const itemsRef = ref(isFunction(items) ? [] : items);
   const { lazyItems } = useSortArrayBySelected(itemsRef, lazyValue, filterByGivenObjects);
