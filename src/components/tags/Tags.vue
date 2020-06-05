@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { watch, ref, computed } from '@vue/composition-api';
+import { ref, computed } from '@vue/composition-api';
 import TagApi from './api/TagsApi';
 import { useTwoWayBinding } from '../helpers/binding';
 import { useSearchWithCleaningAfterEvent } from '../helpers/searching';
@@ -89,25 +89,6 @@ export default {
 
         isSearching.value = false;
       },
-    });
-
-    watch(() => search.value, async (newTag) => {
-      search.value = newTag;
-
-      if (newTag && newTag.length >= 3) {
-        if (newTag.slice(-1) === ',') {
-          addTag(newTag.slice(0, -1));
-        } else {
-          const result = await TagApi.getTags(newTag);
-
-          if (result) {
-            isSearching.value = true;
-            activeTags.value = result.filter((tag) => !lazyValue.value.includes(tag));
-          }
-        }
-      }
-
-      isSearching.value = false;
     });
 
     return {
