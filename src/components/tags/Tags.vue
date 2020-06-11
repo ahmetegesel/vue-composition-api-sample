@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col
+      <div
         v-for="(tag, index) in lazyValue"
         :key="`tag-${index}`"
       >
@@ -11,7 +11,7 @@
         >
           {{ tag }}
         </v-chip>
-      </v-col>
+      </div>
     </v-row>
     <v-autocomplete
       label="Add tag..."
