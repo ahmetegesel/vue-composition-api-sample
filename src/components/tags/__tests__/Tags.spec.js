@@ -95,7 +95,7 @@ describe('Tags Component tests', () => {
     expect(lazyValue.value[0]).toBe(remainingTagAfterRemoval);
   });
 
-  test('When you set new value to search it should set the new value directly to searchText.', () => {
+  test('When new value is set to search it should set the new value directly to searchText.', () => {
     const searchText = { value: '' };
     const searchKeyword = 'test';
 
@@ -110,7 +110,9 @@ describe('Tags Component tests', () => {
     expect(searchText.value).toBe(searchKeyword);
   });
 
-  test('When you set new value to search it should toggle searching flag isSearching to false.', async () => {
+  test('When new value is set to search it should toggle searching flag isSearching to false.', async () => {
+    expect.assertions(1);
+
     jest.spyOn(helpers, 'searchTags').mockImplementationOnce(() => []);
 
     const searchKeyword = 'test';
@@ -122,5 +124,66 @@ describe('Tags Component tests', () => {
     await Promise.resolve((search.value = searchKeyword));
 
     expect(isSearching.value).toBeFalsy();
+  });
+
+  test('When new value shorter than 3 is set to search it should not do anything.', async () => {
+    expect.assertions(3);
+
+    jest.spyOn(helpers, 'searchTags');
+    jest.spyOn(helpers, 'addTag');
+    jest.spyOn(searching, 'useSearchWithCleaningAfterEvent').mockImplementationOnce(() => ({
+      search: { value: '' },
+      onChanged: cleanSearch,
+    }));
+    const searchKeyword = 'te';
+
+    const { search } = Tags.setup({ value }, { emit });
+
+    // Since setter fn of search is async, Promise.resolve makes it possible to await setter fn
+    await Promise.resolve((search.value = searchKeyword));
+
+    expect(helpers.addTag).not.toBeCalled();
+    expect(helpers.searchTags).not.toBeCalled();
+    expect(cleanSearch).not.toBeCalled();
+  });
+
+  test('When new value longer than 2 and ending with "," '
+    + 'is set to search it should add the given keyword omitting the comma.', async () => {
+    expect.assertions(4);
+
+    jest.spyOn(helpers, 'addTag');
+    jest.spyOn(searching, 'useSearchWithCleaningAfterEvent').mockImplementationOnce(() => ({
+      search: { value: '' },
+      onChanged: cleanSearch,
+    }));
+    const searchKeyword = 'test,';
+
+    const { search, lazyValue } = Tags.setup({ value }, { emit });
+    const lazyValueBeforeAct = lazyValue.value;
+
+    // Since setter fn of search is async, Promise.resolve makes it possible to await setter fn
+    await Promise.resolve((search.value = searchKeyword));
+
+    expect(helpers.addTag).toBeCalledWith(searchKeyword.slice(0, -1), lazyValueBeforeAct);
+    expect(cleanSearch).toBeCalled();
+    expect(lazyValue.value.length).toBe(1);
+    expect(lazyValue.value[0]).toBe(searchKeyword.slice(0, -1));
+  });
+
+  test('When new value longer than 2 and NOT ending with "," '
+    + 'is set to search it should search for the given keyword.', async () => {
+    expect.assertions(3);
+
+    const searchKeyword = 'test';
+    jest.spyOn(helpers, 'searchTags').mockImplementation(() => [searchKeyword]);
+
+    const { search, lazyValue, activeTags } = Tags.setup({ value }, { emit });
+
+    // Since setter fn of search is async, Promise.resolve makes it possible to await setter fn
+    await Promise.resolve((search.value = searchKeyword));
+
+    expect(helpers.searchTags).toBeCalledWith(searchKeyword, lazyValue.value);
+    expect(activeTags.value.length).toBe(1);
+    expect(activeTags.value[0]).toBe(searchKeyword);
   });
 });
