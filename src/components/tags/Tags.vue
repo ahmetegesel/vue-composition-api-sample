@@ -31,9 +31,9 @@
 
 <script>
 import { ref, computed } from '@vue/composition-api';
-import TagApi from './api/TagsApi';
 import { useTwoWayBinding } from '../helpers/binding';
 import { useSearchWithCleaningAfterEvent } from '../helpers/searching';
+import { searchTags, addTag } from './helpers';
 
 export default {
   props: {
@@ -45,7 +45,7 @@ export default {
   setup({ value }, { emit }) {
     const activeTags = ref([]);
     const isSearching = ref(false);
-    const { lazyValue, updateValue } = useTwoWayBinding(value, emit);
+    const { lazyValue, updateValue } = useTwoWayBinding(value, emit, []);
     const { search: searchText, onChanged: cleanSearch } = useSearchWithCleaningAfterEvent();
 
     const onTagsChanged = (newValue) => {
@@ -59,14 +59,6 @@ export default {
       lazyValue.value = lazyValue.value.filter((tag) => tag !== item);
     };
 
-    const addTag = (tag) => {
-      if (!lazyValue.value.includes(tag)) {
-        lazyValue.value.push(tag);
-      }
-
-      cleanSearch();
-    };
-
     const search = computed({
       get() {
         return searchText.value;
@@ -76,14 +68,11 @@ export default {
 
         if (searchText.value && searchText.value.length >= 3) {
           if (searchText.value.slice(-1) === ',') {
-            addTag(searchText.value.slice(0, -1));
+            lazyValue.value = addTag(searchText.value.slice(0, -1), lazyValue.value);
+            cleanSearch();
           } else {
-            const result = await TagApi.getTags(searchText.value);
-
-            if (result) {
-              isSearching.value = true;
-              activeTags.value = result.filter((tag) => !lazyValue.value.includes(tag));
-            }
+            activeTags.value = await searchTags(searchText.value, lazyValue.value);
+            isSearching.value = true;
           }
         }
 
@@ -97,7 +86,6 @@ export default {
       isSearching,
       activeTags,
       remove,
-      addTag,
       onTagsChanged,
     };
   },

@@ -61,5 +61,5 @@ export const sortArrayBy = (predicateFn, ...args) => (allItems, selectedItems) =
 
   const notSelected = allItems.filter(negateFn(filterFn));
 
-  return [...selectedItems, ...notSelected];
+  return [...(selectedItems || []), ...notSelected];
 };
